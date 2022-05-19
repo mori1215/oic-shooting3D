@@ -10,6 +10,7 @@
 //INCLUDE
 #include	"GameApp.h"
 #include "Player.h"
+#include "Stage.h"
 
 CCamera gCamera;
 
@@ -17,7 +18,13 @@ CDirectionalLight gLight;
 
 CPlayer gPlayer;
 
+CStage gStage;
+
 bool gbDebug = false;
+
+CVector3 gCameraPosition;
+CVector3 gTargetPosition;
+CVector3 gUpVector;
 
 /*************************************************************************//*!
 		@brief			アプリケーションの初期化
@@ -30,8 +37,12 @@ MofBool CGameApp::Initialize(void){
 	//リソース配置ディレクトリの設定
 	CUtilities::SetCurrentDirectory("Resource");
 
+	gCameraPosition = Vector3(0, 6.0f, -17.0f);
+	gTargetPosition = Vector3(0, 0, -10);
+	gUpVector = Vector3(0, 1, 0);
+
 	gCamera.SetViewPort();
-	gCamera.LookAt(Vector3(0, 6.0f, -17.0f), Vector3(0, 0, -10), Vector3(0, 1, 0));
+	gCamera.LookAt(gCameraPosition, gTargetPosition, gUpVector);
 	gCamera.PerspectiveFov(MOF_ToRadian(60.0f), 1024.0f / 768.0f, 0.01f, 1000.0f);
 	CGraphicsUtilities::SetCamera(&gCamera);
 
@@ -42,8 +53,10 @@ MofBool CGameApp::Initialize(void){
 	CGraphicsUtilities::SetDirectionalLight(&gLight);
 
 	gPlayer.Load();
+	gStage.Load();
 
 	gPlayer.Initialize();
+	gStage.Initialize();
 	
 	return TRUE;
 }
@@ -59,6 +72,7 @@ MofBool CGameApp::Update(void){
 	g_pInput->RefreshKey();
 
 	gPlayer.Update();
+	gStage.Update();
 
 	if (g_pInput->IsKeyPush(MOFKEY_F1))
 	{
@@ -66,11 +80,12 @@ MofBool CGameApp::Update(void){
 	}
 
 	float posX = gPlayer.GetPosition().x * 0.4f;
-	CVector3 cpos = gCamera.GetViewPosition();
-	CVector3 tpos = gCamera.GetTargetPosition();
-	CVector3 vup = CVector3(0, 1, 0);
+	CVector3 cpos = gCameraPosition;
+	CVector3 tpos = gTargetPosition;
+	CVector3 vup = gUpVector;
 	cpos.x = posX;
 	tpos.x = posX;
+	vup.RotationZ(gPlayer.GetPosition().x / FIELD_HALF_X * MOF_ToRadian(10.0f));
 	gCamera.LookAt(cpos, tpos, vup);
 	gCamera.Update();
 
@@ -93,6 +108,7 @@ MofBool CGameApp::Render(void){
 	g_pGraphics->SetDepthEnable(TRUE);
 
 	gPlayer.Render();
+	gStage.Render();
 
 	if (gbDebug)
 	{
@@ -106,6 +122,7 @@ MofBool CGameApp::Render(void){
 	if (gbDebug)
 	{
 		gPlayer.RenderDebugText();
+		gStage.RenderDebugText();
 	}
 
 	// 描画の終了
@@ -121,5 +138,6 @@ MofBool CGameApp::Render(void){
 *//**************************************************************************/
 MofBool CGameApp::Release(void){
 	gPlayer.Release();
+	gStage.Release();
 	return TRUE;
 }
