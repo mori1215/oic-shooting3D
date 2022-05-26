@@ -145,7 +145,7 @@ void CPlayer::UpdateSingleShot()
 		CVector3 ShotPos(0, 0, 0);
 		ShotPos += m_Pos;
 		m_ShotWait = PLAYERSHOT_WAIT;
-		m_ShotArray[i].Fire(ShotPos);
+		m_ShotArray[i].Fire(ShotPos,Vector3(0,0,0.4));
 		break;
 	}
 }
@@ -161,7 +161,7 @@ void CPlayer::UpdateDoubleShot()
 			ShotPos.RotationZ(m_RotZ);
 			ShotPos += m_Pos;
 			m_ShotWait = PLAYERSHOT_WAIT;
-			m_ShotArray[i].Fire(ShotPos);
+			m_ShotArray[i].Fire(ShotPos,Vector3(0,0,0.4));
 			break;
 		}
 	}
@@ -169,19 +169,19 @@ void CPlayer::UpdateDoubleShot()
 
 void CPlayer::UpdateTrippleShot()
 {
-	//for (int cnt = 0; cnt < 3; cnt++)
-	//{
-	//	for (int i = 0; i < PLAYERSHOT_COUNT; i++)
-	//	{
-	//		if (m_ShotArray[i].GetShow()) { continue; }
-	//		CVector3 ShotPos(0.4f * (cnt * 2 - 1), 0, 0);
-	//		ShotPos.RotationZ(m_RotZ);
-	//		ShotPos += m_Pos;
-	//		m_ShotWait = PLAYERSHOT_WAIT;
-	//		m_ShotArray[i].Fire(ShotPos);
-	//		break;
-	//	}
-	//}
+	for (int cnt = 0; cnt < 3; cnt++)
+	{
+		for (int i = 0; i < PLAYERSHOT_COUNT; i++)
+		{
+			if (m_ShotArray[i].GetShow()) { continue; }
+			CVector3 ShotPos(0.4f * (cnt - 1), 0, 0);
+			ShotPos.RotationZ(m_RotZ);
+			ShotPos += m_Pos;
+			m_ShotWait = PLAYERSHOT_WAIT;
+			m_ShotArray[i].Fire(ShotPos,Vector3(0.05f * (cnt - 1),0.0f,0.4));
+			break;
+		}
+	}
 }
 
 void CPlayer::UpdateMode()
