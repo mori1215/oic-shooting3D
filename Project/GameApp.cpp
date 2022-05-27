@@ -11,12 +11,16 @@
 #include	"GameApp.h"
 #include "Player.h"
 #include "Stage.h"
+#include "Stage1.h"
 
 CCamera gCamera;
 
 CDirectionalLight gLight;
 
 CPlayer gPlayer;
+
+#define ENEMY_COUNT (20)
+CEnemy gEnemyArray[ENEMY_COUNT];
 
 CStage gStage;
 
@@ -56,7 +60,12 @@ MofBool CGameApp::Initialize(void){
 	gStage.Load();
 
 	gPlayer.Initialize();
-	gStage.Initialize();
+	gStage.Initialize(&gStg1EnemyStart);
+
+	for (int i = 0; i < ENEMY_COUNT; i++)
+	{
+		gEnemyArray[i].Initialize();
+	}
 	
 	return TRUE;
 }
@@ -72,7 +81,12 @@ MofBool CGameApp::Update(void){
 	g_pInput->RefreshKey();
 
 	gPlayer.Update();
-	gStage.Update();
+	gStage.Update(gEnemyArray,ENEMY_COUNT);
+
+	for (int i = 0; i < ENEMY_COUNT; i++)
+	{
+		gEnemyArray[i].Update();
+	}
 
 	if (g_pInput->IsKeyPush(MOFKEY_F1))
 	{
@@ -110,6 +124,11 @@ MofBool CGameApp::Render(void){
 	gPlayer.Render();
 	gStage.Render();
 
+	for (int i = 0; i < ENEMY_COUNT; i++)
+	{
+		gEnemyArray[i].Render();
+	}
+
 	if (gbDebug)
 	{
 		CMatrix44 matWorld;
@@ -123,6 +142,11 @@ MofBool CGameApp::Render(void){
 	{
 		gPlayer.RenderDebugText();
 		gStage.RenderDebugText();
+
+		for (int i = 0; i < ENEMY_COUNT; i++)
+		{
+			gEnemyArray[i].RenderDebugText(i);
+		}
 	}
 
 	// •`‰æ‚ÌI—¹
