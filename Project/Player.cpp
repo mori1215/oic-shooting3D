@@ -9,6 +9,7 @@ m_Mesh(),
 m_Pos(0.0f,0.0f,0.0f),
 m_RotZ(0.0f),
 m_Speed(0.0f),
+m_bDead(false),
 m_ShotMesh(),
 m_ShotArray(),
 m_ShotWait(),
@@ -50,6 +51,7 @@ void CPlayer::Initialize(void){
 	m_RotZ = 0;
 	m_Speed = PLAYER_SPEED;
 	m_ShotMode = MODE_SINGLE;
+	m_bDead = false;
 	for (int i = 0; i < PLAYERSHOT_COUNT; i++)
 	{
 		m_ShotArray[i].Initialize();
@@ -60,6 +62,11 @@ void CPlayer::Initialize(void){
  * XV
  */
 void CPlayer::Update(void){
+	if (m_bDead)
+	{
+		return;
+	}
+
 	float Roll = 0;
 	float RotSpeed = MOF_ToRadian(10);
 
@@ -200,10 +207,53 @@ void CPlayer::UpdateMode()
 	}
 }
 
+void CPlayer::RenderDebug(void)
+{
+	CGraphicsUtilities::RenderSphere(GetSphere(), Vector4(0, 1, 0, 0.3f));
+
+	for (int i = 0; i < PLAYERSHOT_COUNT; i++)
+	{
+		m_ShotArray[i].RenderDebug();
+	}
+}
+
+void CPlayer::CollisionEnemy(CEnemy& ene)
+{
+	if (!ene.GetShow())
+	{
+		return;
+	}
+	CSphere ps = GetSphere();
+	CSphere es = ene.GetSphere();
+	if (ps.CollisionSphere(es))
+	{
+		m_bDead = true;
+	}
+	for (int i = 0; i < PLAYERSHOT_COUNT; i++)
+	{
+		if (!m_ShotArray[i].GetShow())
+		{
+			continue;
+		}
+		CSphere ss = m_ShotArray[i].GetSphere();
+		if (ss.CollisionSphere(es))
+		{
+			ene.Damage(1);
+			m_ShotArray[i].SetShow(false);
+			break;
+		}
+	}
+}
+
 /**
  * •`‰æ
  */
 void CPlayer::Render(void){
+	if (m_bDead)
+	{
+		return;
+	}
+
 	CMatrix44 matWorld;
 	matWorld.RotationZ(m_RotZ);
 	matWorld.SetTranslation(m_Pos);
