@@ -245,6 +245,21 @@ void CPlayer::CollisionEnemy(CEnemy& ene)
 	}
 }
 
+void CPlayer::CollisionEnemyShot(CEnemyShot& shot)
+{
+	CSphere ps = GetSphere();
+	if (!shot.GetShow())
+	{
+		return;
+	}
+	CSphere ss = shot.GetSphere();
+	if (ss.CollisionSphere(ps))
+	{
+		m_bDead = true;
+		shot.SetShow(false);
+	}
+}
+
 /**
  * •`‰æ
  */

@@ -46,4 +46,5 @@ public:
 	CSphere GetSphere() { return CSphere(m_Pos, 0.4f); }
 	void CollisionEnemy(CEnemy& ene);
 	bool IsDead() { return m_bDead; }
+	void CollisionEnemyShot(CEnemyShot& shot);
 };

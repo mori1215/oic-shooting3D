@@ -87,7 +87,19 @@ void CEnemy::Update(CEnemyShot* shot, int smax){
 				m_ShotWait = m_ShotWaitSet;
 
 				Vector3 direction = m_TargetPos - m_Pos;
+
+				float distance = CVector3Utilities::Length(direction);
+
+				if (direction > 0)
+				{
+					direction /= distance;
+					newShot->Fire(m_Pos, direction * 0.075f);
+				}
 			}
+		}
+		else
+		{
+			m_ShotWait--;
 		}
 	}
 
